@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: isis-service-gateway
+  config:
+    import:
+      - mq-settings.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 10s
+server:
+  shutdown: graceful
+
+management:
+  server:
+    address: 127.0.0.1 # 設定為 127.0.0.1 以避免外部訪問
+    port: 9012
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        # include: metrics    # 只開放 metrics 端點
+        include: "*"      # 或者開放所有端點
+
+  endpoint:
+    metrics:
+      enabled: true        # 確保 metrics 端點已啟用
+
+filters:
+  strnkey:
+    - 30011002
+    - 11111111
+
+tandem:
+  api:
+    url: http://localhost:6000/api/v1/tandem
+    username: tandem
+    password: ENC(vWKHb/FF8KgX2kovlJtBx3hq2JWNd0eeyB+TGSMZfluHkU4M0bxLVXc4aOdvL4QZ)
+
+
+

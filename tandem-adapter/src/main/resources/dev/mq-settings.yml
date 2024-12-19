@@ -1,0 +1,30 @@
+mq:
+  host: 192.168.31.254
+  port: 1414
+  ssl:
+    keyStoreType: JKS
+    keyStore: /Users/guojun/Documents/workspace/webcomm/Standardchartered/ISISService/SCBISIS2/src/isis-service/service-gateway/src/main/resources/keys/client.keystore.jks
+    keyStorePassword: "passw0rd"
+    trustStoreType: JKS
+    trustStore: /Users/guojun/Documents/workspace/webcomm/Standardchartered/ISISService/SCBISIS2/src/isis-service/service-gateway/src/main/resources/keys/client.truststore.jks
+    trustStorePassword: "passw0rd"
+    cipherSuite: TLS_RSA_WITH_AES_256_CBC_SHA256
+    sslPeerName: "CN=192.168.31.*" # 限制 MQ Server 憑證的 DN
+
+
+
+  qmgr: QM1
+  channelName: SCB.QM1.CH1
+  
+  queue:
+    request: SCB.QM1.Q1
+    response: SCB.QM1.Q1
+
+
+  ccsid: 1208            # 設置MQ字符集 1208=UTF-8
+  heartbeatInterval: 2000 # Heartbeat interval (單位為 milliseconds)
+  transactionExpiry: 30000 # 設置訊息過期時間(單位為 milliseconds)
+  responseWaitInterval: 10000  # 2way 時等待 response 的時間(單位為 milliseconds)
+  maxConnections: 10
+  maxSessionsPerConnection: 5
+  connectionTimeout: 30000

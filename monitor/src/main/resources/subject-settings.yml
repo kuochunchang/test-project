@@ -1,0 +1,19 @@
+subjects:
+  - name: 服務1
+    service-gateway:
+      metrics:
+        endpoint: http://127.0.0.1:9011
+    tandem-adapter:
+      metrics:
+        endpoint: http://127.0.0.1:9012
+
+  - name: 服務2
+    service-gateway:
+      metrics:
+        endpoint: http://127.0.0.1:9011
+    tandem-adapter:
+      metrics:
+        endpoint: http://127.0.0.1:9012
+
+
+  

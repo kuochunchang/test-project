@@ -1,0 +1,56 @@
+package tw.com.sc.model;
+
+import javax.jms.JMSException;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+import com.ibm.mq.jms.MQConnectionFactory;
+import com.ibm.msg.client.wmq.WMQConstants;
+
+import lombok.Data;
+
+@ConfigurationProperties(prefix = "mq")
+@Component
+@Data
+public class MqConfig {
+    private String host;
+    private int port;
+    private String qmgr;
+    private String channelName;
+    private String username;
+    private String password;
+    private QueueConfig queue;
+    private int ccsid;
+    private int heartbeatInterval;
+    private int transactionExpiry;
+    private int responseWaitInterval;
+
+    private int maxConnections = 10;
+    private int maxSessionsPerConnection = 5;
+    private int connectionTimeout = 30000;
+
+    @Bean
+    public MQConnectionFactory mqConnectionFactory() {
+        MQConnectionFactory factory = new MQConnectionFactory();
+        factory.setHostName(host);
+        try {
+            factory.setPort(port);
+            factory.setQueueManager(qmgr);
+            factory.setChannel(channelName);
+            factory.setStringProperty(WMQConstants.USERID, username);
+            factory.setStringProperty(WMQConstants.PASSWORD, password);
+            factory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
+        } catch (JMSException e) {
+            throw new RuntimeException("MQ連線工廠建立失敗", e);
+        }
+        return factory;
+    }
+
+    @Data
+    public static class QueueConfig {
+        private String request;
+        private String response;
+    }
+}

@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: service-gateway-01
+  config:
+    import: 
+      - mq-settings.yml
+      - client-settings.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 10s
+
+server:
+  port: 8081
+  shutdown: graceful
+
+transaction:
+  message-handler: twoway
+
+management:
+  server:
+    address: 127.0.0.1  # 預設綁定到本地位址
+    port: 9011
+
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      enabled: true
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+
+
+
+
+
+

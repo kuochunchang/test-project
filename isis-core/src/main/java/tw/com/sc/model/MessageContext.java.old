@@ -1,0 +1,143 @@
+package tw.com.sc.model;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+@Data
+@Slf4j
+public class MessageContext {
+    private String traceId = UUID.randomUUID().toString();
+    private Status status;
+    private String request;
+    private String response;
+    private List<TransactionMessage> history = new ArrayList<>();
+    private static final ObjectMapper objectMapper = getObjectMapper();
+
+    private static final String HOST_NAME;
+    static {
+        String hostName;
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            hostName = "unknown-host";
+        }
+        HOST_NAME = hostName;
+    }
+
+    public enum Status {
+        SUCCESS, FAILURE
+    }
+
+    public static MessageContext createFrom(String request) {
+        MessageContext txContext = new MessageContext();
+        txContext.setRequest(request);
+        return txContext;
+    }
+
+    public void setRequest(String request) {
+
+        this.request = request;
+        this.response = null;
+        String requestHost;
+
+        requestHost = HOST_NAME;
+
+        TransactionMessage txMessage = new TransactionMessage();
+        txMessage.setRequestTimestamp(System.currentTimeMillis());
+        txMessage.setRequestHost(requestHost);
+        txMessage.setRequest(request);
+        this.history.add(txMessage);
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+        String responseHost;
+        responseHost = HOST_NAME;
+        TransactionMessage lastHistory = this.history.get(this.history.size() - 1);
+        lastHistory.setResponse(response);
+        lastHistory.setResponseHost(responseHost);
+        lastHistory.setResponseTimestamp(System.currentTimeMillis());
+    }
+
+    @Override
+    public String toString() {
+        // return "[traceId=" + traceId + ", status=" + status + ", request=" + request
+        // + ", response=" + response
+        // + ", history=" + history + "]";
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            log.error("toString 序列化失敗", e);
+            return super.toString();
+        }
+    }
+
+    public static String toJson(MessageContext txContext) throws JsonProcessingException {
+        if (txContext == null) {
+            throw new IllegalArgumentException("輸入參數不能為空");
+        }
+
+        return objectMapper.writeValueAsString(txContext);
+
+    }
+
+    public static MessageContext fromJsonString(String json) throws JsonMappingException, JsonProcessingException {
+        if (json == null || json.trim().isEmpty()) {
+            throw new IllegalArgumentException("JSON字串不能為空");
+        }
+
+        return objectMapper.readValue(json, MessageContext.class);
+
+    }
+
+    @Data
+    public static class TransactionMessage {
+        private long requestTimestamp;
+        private String requestHost;
+        private String request;
+        private long responseTimestamp;
+        private String responseHost;
+        private String response;
+
+        @Override
+        public String toString() {
+            // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd
+            // HH:mm:ss.SSS")
+            // .withZone(ZoneId.systemDefault());
+            // String reqTime = formatter.format(Instant.ofEpochMilli(requestTimestamp));
+            // String respTime = responseTimestamp > 0
+            // ? formatter.format(Instant.ofEpochMilli(responseTimestamp))
+            // : "尚未回應";
+
+            // return " [requestTimestamp=" + reqTime + ", requestHost=" + requestHost
+            // + ", request="
+            // + request + ", responseTimestamp=" + respTime + ", responseHost=" +
+            // responseHost + ", response="
+            // + response + "]";
+            try {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+            } catch (JsonProcessingException e) {
+                log.error("toString 序列化失敗", e);
+                return super.toString();
+            }
+        }
+    }
+
+    private static class ObjectMapperHolder {
+        private static final ObjectMapper INSTANCE = new ObjectMapper();
+    }
+
+    private static ObjectMapper getObjectMapper() {
+        return ObjectMapperHolder.INSTANCE;
+    }
+}

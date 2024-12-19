@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: monitor
+  config:
+    import:
+      - subject-settings.yml
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kcatatos@gmail.com
+    password: gdijadscuijupgon
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+monitor:
+  mail:
+    from: user@your-domain.com
+    to: kc@webcomm.com.tw
